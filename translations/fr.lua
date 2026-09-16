@@ -9,10 +9,12 @@ return {
   ['keybind_talk'] = 'Radio - Parler',
   ['keybind_open'] = 'Radio - Ouvrir / fermer',
   ['command_radio_description'] = 'Ouvre ou ferme la radio',
+  ['command_radioanim_description'] = "Règle l'animation et le prop de la radio en direct",
 
   web = {
     ['radio_no_channel'] = 'Aucune fréquence',
-    ['radio_home_hint'] = 'Menu · Choisir une fréquence',
+    ['radio_home_hint'] = 'Pavé · Taper une fréquence',
+    ['radio_leave'] = 'Quitter la fréquence',
     ['radio_locked_title'] = 'Accès restreint',
     ['radio_locked_subtitle'] = "Réservé aux services d'urgence",
     ['radio_channel_hint'] = 'Flèches · Canal',

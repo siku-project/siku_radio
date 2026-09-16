@@ -35,6 +35,7 @@ client_scripts {
   'client/modules/voice.lua',
   'client/modules/hud.lua',
   'client/modules/talk.lua',
+  'client/modules/tuning.lua',
   'client/modules/ui.lua',
   'client/modules/events.lua',
   'client/modules/api.lua',
