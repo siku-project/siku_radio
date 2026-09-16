@@ -244,6 +244,16 @@
   }
 
   const handleKeyboard = (event: KeyboardEvent): void => {
+    if (!radio.state.visible) {
+      return
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      actions.close()
+      return
+    }
+
     if (!interactive) {
       return
     }
@@ -258,7 +268,6 @@
       ArrowUp: { action: 'up' },
       ArrowDown: { action: 'down' },
       Enter: { action: ui.current === 'frequency' ? 'hash' : 'select' },
-      Escape: { action: 'back' },
       Backspace: { action: 'star' },
       m: { action: 'menu' },
     }
