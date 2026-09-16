@@ -80,18 +80,33 @@ DeviceConfig = {
   animation = {
     enabled = true,
 
-    --- The prop, the bone it hangs from, and where it sits on it.
+    --- The prop, the bone it hangs from (57005 is the right hand), and
+    --- where it sits on it.
     prop = 'prop_cs_hand_radio',
     bone = 57005,
     offset = vector3(0.14, 0.01, -0.02),
-    rotation = vector3(110.0, -10.0, -20.0),
+    rotation = vector3(110.0, -10.0, 160.0),
 
-    --- The pose: the right hand brings the radio up in front of the mouth
-    --- and holds it there, upper body only, so the player keeps walking.
-    --- 'generic_radio_enter' from the same dictionary is the police one,
-    --- the left hand on the shoulder mic.
-    dict = 'random@arrests',
-    anim = 'generic_radio_chatter',
+    --- The pose, upper body only so the player keeps walking: the right
+    --- hand holds the radio up at the face for as long as the key is held.
+    --- The 'random@arrests' clips are the police ones, the left hand on
+    --- the shoulder mic, whatever the prop does in the right hand.
+    dict = 'cellphone@',
+    anim = 'cellphone_call_listen_base',
+
+    --- Tuning
+    ---
+    --- Set to true to get the client command /radioanim, which changes
+    --- the pose and the prop live while the key is held:
+    ---   /radioanim                       prints the current values
+    ---   /radioanim <dict> <anim>         another pose
+    ---   /radioanim bone <id>             another bone
+    ---   /radioanim offset <x> <y> <z>    moves the prop on the bone
+    ---   /radioanim rotation <x> <y> <z>  turns it
+    --- Copy the printed values here once it looks right.
+    ---
+    --- Default: false
+    tuning = false,
 
     --- Whether the pose plays inside a vehicle.
     ---

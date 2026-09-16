@@ -9,10 +9,12 @@ return {
   ['keybind_talk'] = 'Radio - Talk',
   ['keybind_open'] = 'Radio - Open / close',
   ['command_radio_description'] = 'Opens or closes the radio',
+  ['command_radioanim_description'] = 'Tunes the radio animation and prop live',
 
   web = {
     ['radio_no_channel'] = 'No frequency',
-    ['radio_home_hint'] = 'Menu · Pick a frequency',
+    ['radio_home_hint'] = 'Keypad · Type a frequency',
+    ['radio_leave'] = 'Leave the frequency',
     ['radio_locked_title'] = 'Restricted access',
     ['radio_locked_subtitle'] = 'Emergency services only',
     ['radio_channel_hint'] = 'Arrows · Channel',

@@ -16,6 +16,7 @@
     | 'star'
     | 'hash'
     | 'alert'
+    | 'power'
 
   export interface KeyPress {
     action: KeyAction
@@ -79,6 +80,15 @@
       top: 67.0,
       width: 9.6,
       height: 6.4,
+      round: true,
+    },
+    {
+      action: 'power',
+      label: 'Power',
+      left: 47.6,
+      top: 27.6,
+      width: 11.4,
+      height: 8.6,
       round: true,
     },
   ]

@@ -15,7 +15,7 @@ Built on [`siku_voice`](https://github.com/siku-project/siku_voice): the radio o
 - **Frequencies and channels** — reserved bands belong to a job (LSPD and EMS out of the box) and carry named channels; every other frequency is open, the frequency being the channel, or carrying numbered channels by configuration. The keypad types a frequency, `#` tunes it, `*` erases.
 - **Presets** — P1 to P3 jump to a reserved band, and only answer to a player holding its job. No job resource exists yet: the core roles stand in, and a resolver hook is ready for one.
 - **Push to talk through siku_voice** — Left Alt by default, rebindable, working with the device closed: the transmission rides a voice route to the members of the frequency, the microphone is held through the voice, and everyone hears the talker through the radio effect at their own device volume. A dead or cuffed player, closed by a voice restriction, cannot transmit.
-- **Animation and prop** — the radio in the hand, raised to the mouth while transmitting.
+- **Animation and prop** — the radio in the right hand, held up at the face while transmitting, upper body only. Pose, bone, offset and rotation live in `config/device.lua`; with `animation.tuning` on, `/radioanim` changes them live while the key is held and prints the values to copy back.
 - **Sounds** — mic clicks, squelch on reception, key tones, boot, alert, all switchable from the device settings.
 - **A working menu** — frequency, channels, recents, scan, volume, leave the frequency, emergency alert, settings, info, power off. The menu shows each player what they can use: a citizen never sees the alert, nor the channels when open frequencies are single (a service member always does, for their own bands), and the frequency is only left once one is tuned. Power off leaves the frequency, puts the device away and boots it again the next time. On a band with channels the arrows switch channel from the home screen, and VFO/MR steps to the next one.
 - **Emergency alert** — a member of a service raises it in one press of the orange button at the base of the antenna, live only on their own band, or from the menu, and every device tuned to any band of that service, on any channel, rings a radio siren and shows who, where and since when. It rings in the pocket too: the player opens their radio and presses STOP. A cooldown, an optional auto stop, and a switch to turn the whole thing off live in `config/alerts.lua`.
@@ -50,8 +50,12 @@ The device config travels to the interface with the access rule and the frequenc
 | `/radio` | Opens or closes the device, until the inventory item takes over. |
 | Arrows, Enter | Walk the menu and pick. On the home screen the arrows switch channel, or the volume on a single-channel frequency. |
 | Escape | Closes the radio, whatever screen it shows. The BACK key goes one screen back instead. |
+| `Backspace` | On the home screen, leaves the frequency. |
+| `P`, or the top knob | Powers the radio off. |
 | `+` / `-` | The volume, from any screen. |
 | Digits, `Backspace`, `Enter` | Type a frequency, erase, tune. |
+
+The home screen does the frequent things in one click: the bands of the player's service and the recent frequencies sit on it as chips, the channels of the tuned band as tabs, and a cross next to the frequency leaves it. The menu keeps the rest.
 
 ### Access
 
