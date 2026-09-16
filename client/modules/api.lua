@@ -16,6 +16,12 @@ local function toggle()
   RadioUi.toggle()
 end
 
+--- Switches the device off: transmission ended, frequency left, display away.
+---@return nil
+local function powerOff()
+  RadioUi.powerOff()
+end
+
 --- Whether the device is on screen.
 ---@return boolean open Whether the interface shows.
 local function isOpen()
@@ -83,6 +89,7 @@ end
 exports('Open', open)
 exports('Close', close)
 exports('Toggle', toggle)
+exports('PowerOff', powerOff)
 exports('IsOpen', isOpen)
 exports('GetTuned', getTuned)
 exports('Tune', tune)

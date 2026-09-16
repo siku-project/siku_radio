@@ -28,6 +28,8 @@
   "menu_emergency": "Emergency",
   "menu_frequency": "Frequency",
   "menu_info": "Info",
+  "menu_leave": "Leave the frequency",
+  "menu_power": "Power off",
   "menu_recents": "Recents",
   "menu_scan": "Scan",
   "menu_settings": "Settings",

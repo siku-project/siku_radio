@@ -1,7 +1,7 @@
 RadioTalk = {}
 
 local KEYBIND <const> = 'siku_radio_talk'
-local ANIM_FLAG_UPPER_BODY <const> = 50
+local ANIM_FLAG_UPPER_BODY <const> = 49
 local ANIM_BLEND_IN <const> = 8.0
 local ANIM_BLEND_OUT <const> = -4.0
 local ANIM_LOOP <const> = -1

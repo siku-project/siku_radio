@@ -42,6 +42,8 @@ return {
     ['menu_volume'] = 'Volume',
     ['menu_emergency'] = 'Urgence',
     ['menu_settings'] = 'Réglages',
+    ['menu_leave'] = 'Quitter la fréquence',
+    ['menu_power'] = 'Éteindre',
     ['menu_info'] = 'Infos',
     ['frequency_hint'] = 'Pavé · Saisir, # valider, * effacer',
     ['frequency_range'] = 'De {min} à {max} MHz',

@@ -42,6 +42,8 @@ return {
     ['menu_volume'] = 'Volume',
     ['menu_emergency'] = 'Emergency',
     ['menu_settings'] = 'Settings',
+    ['menu_leave'] = 'Leave the frequency',
+    ['menu_power'] = 'Power off',
     ['menu_info'] = 'Info',
     ['frequency_hint'] = 'Keypad · Type, # to tune, * to clear',
     ['frequency_range'] = 'From {min} to {max} MHz',
