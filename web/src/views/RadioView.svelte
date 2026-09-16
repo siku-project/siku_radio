@@ -28,13 +28,36 @@
   let emergency = $state<EmergencyScreen | null>(null)
   let scanTimer: ReturnType<typeof setInterval> | null = null
 
-  const interactive = $derived(radio.state.visible && radio.state.booted && config.allowed)
+  const interactive = $derived(radio.state.visible && !radio.booting && config.allowed)
 
   const presetsAllowed = $derived(
     Object.fromEntries(config.access.presets.map((preset) => [preset.index, preset.allowed])),
   )
 
   const alertAllowed = $derived(config.canAlert(radio.state.tuned?.frequency ?? null))
+
+  /** Opens a menu entry: its screen, or what it does when it has none. */
+  const openEntry = (index: number): void => {
+    const entry = menuEntries()[index]
+
+    if (!entry) {
+      return
+    }
+
+    ui.setCursor('menu', index)
+
+    if (entry.screen) {
+      ui.push(entry.screen)
+      return
+    }
+
+    entry.run?.()
+
+    if (entry.id === 'leave') {
+      ui.notify(m.toast_left(), 'info')
+      ui.home()
+    }
+  }
 
   /** Where the arrows go and what the dial picks, per screen. */
   const handleDial = (action: 'up' | 'down' | 'select'): void => {
@@ -44,7 +67,7 @@
     switch (screen) {
       case 'menu':
         if (action === 'select') {
-          ui.push(menuEntries()[ui.cursor('menu')]!.screen)
+          openEntry(ui.cursor('menu'))
         } else {
           ui.moveCursor('menu', direction, menuEntries().length)
         }
@@ -196,9 +219,15 @@
         toggleScan()
         break
       case 'vfo':
-        if (!actions.cycleChannel(1)) {
+        if (actions.cycleChannel(1)) {
+          break
+        }
+
+        if (config.hasChannels) {
           ui.menu()
           ui.push('channels')
+        } else {
+          ui.notify(m.channels_single(), 'info')
         }
         break
       case 'p1':
@@ -314,7 +343,7 @@
                   {#if !config.allowed || ui.current === 'home'}
                     <RadioScreen device={radio.state} />
                   {:else if ui.current === 'menu'}
-                    <MenuScreen />
+                    <MenuScreen onPick={openEntry} />
                   {:else if ui.current === 'frequency'}
                     <FrequencyScreen />
                   {:else if ui.current === 'channels'}

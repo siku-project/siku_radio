@@ -1,6 +1,29 @@
 RadioUi = {}
 
 local KEYBIND <const> = 'siku_radio_open'
+local RELEASE_GRACE_MS <const> = 150
+
+--- Keeps the game away from the pointer and the keys while the device is
+--- open: no camera turn, no shot on a click, no pause menu on Escape.
+---@return nil
+local function holdControls()
+  local controls <const> = DeviceConfig.focus.controls
+
+  if type(controls) == 'table' and #controls > 0 then
+    Siku.controls.disable(table.unpack(controls))
+  end
+end
+
+--- Gives the controls back, a moment after the device went away, so the
+--- key that closed it never reaches the game on its way up.
+---@return nil
+local function releaseControls()
+  SetTimeout(RELEASE_GRACE_MS, function()
+    if not RadioState.isOpen() then
+      Siku.controls.clear()
+    end
+  end)
+end
 
 --- Reads a NUI callback argument as a number.
 ---@param value any The raw value.
@@ -26,6 +49,7 @@ function RadioUi.open()
   RadioState.setOpen(true)
   SetNuiFocus(true, true)
   SetNuiFocusKeepInput(true)
+  holdControls()
   RadioNui.setVisible(true)
 end
 
@@ -40,6 +64,7 @@ function RadioUi.close()
   RadioState.setOpen(false)
   SetNuiFocusKeepInput(false)
   SetNuiFocus(false, false)
+  releaseControls()
   RadioNui.setVisible(false)
 end
 
@@ -53,9 +78,23 @@ function RadioUi.toggle()
   end
 end
 
+--- Switches the device off: the transmission ends, the frequency is left,
+--- and the display goes away. The next opening boots it again.
+---@return nil
+function RadioUi.powerOff()
+  RadioTalk.stop()
+  TriggerServerEvent('siku_radio:server:leave')
+  RadioUi.close()
+end
+
 RegisterNUICallback('siku_radio:nui:close', function(_, cb)
   cb({})
   RadioUi.close()
+end)
+
+RegisterNUICallback('siku_radio:nui:power', function(_, cb)
+  cb({})
+  RadioUi.powerOff()
 end)
 
 RegisterNUICallback('siku_radio:nui:tune', function(data, cb)
@@ -117,5 +156,6 @@ AddEventHandler('onResourceStop', function(resource)
   if resource == Siku.name then
     SetNuiFocusKeepInput(false)
     SetNuiFocus(false, false)
+    Siku.controls.clear()
   end
 end)

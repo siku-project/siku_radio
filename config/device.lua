@@ -17,6 +17,32 @@ DeviceConfig = {
     open = false,
   },
 
+  --- Focus
+  ---
+  --- The device takes the pointer while it is open, and the player keeps
+  --- moving. Everything listed here is disabled in the meantime so a click
+  --- never fires, the mouse never turns the camera, and the keys the
+  --- display reads (digits, arrows, Enter, Escape, M) never reach the
+  --- game: weapon slots, phone, pause menu, interaction menu.
+  focus = {
+    controls = {
+      --- Camera: look, next camera, look behind.
+      1, 2, 0, 26,
+      --- Combat: attack, aim, weapon wheel, reload, cover, detonate,
+      --- grenade, melee, secondary attack.
+      24, 25, 37, 45, 44, 47, 58, 140, 141, 142, 143, 257, 263, 264,
+      --- Weapon selection: scroll and the digit keys.
+      14, 15, 16, 17, 157, 158, 159, 160, 161, 162, 163, 164, 165, 261, 262,
+      --- Vehicle combat and mouse steering.
+      68, 69, 70, 92, 114, 106,
+      --- The keys the display reads: the arrows (phone and its
+      --- navigation), Enter (talk, accept, select), Backspace (cancel).
+      27, 172, 173, 174, 175, 176, 177, 18, 201, 194,
+      --- Frontend: pause menu (Escape), cancel, interaction menu, chat.
+      199, 200, 202, 244, 245, 246,
+    },
+  },
+
   --- Volume
   ---
   --- The device volume scales how loud a transmission is heard through
@@ -60,9 +86,12 @@ DeviceConfig = {
     offset = vector3(0.14, 0.01, -0.02),
     rotation = vector3(110.0, -10.0, -20.0),
 
-    --- The pose.
+    --- The pose: the right hand brings the radio up in front of the mouth
+    --- and holds it there, upper body only, so the player keeps walking.
+    --- 'generic_radio_enter' from the same dictionary is the police one,
+    --- the left hand on the shoulder mic.
     dict = 'random@arrests',
-    anim = 'generic_radio_enter',
+    anim = 'generic_radio_chatter',
 
     --- Whether the pose plays inside a vehicle.
     ---

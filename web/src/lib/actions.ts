@@ -122,4 +122,22 @@ export const actions = {
 
     radio.setVisible(false)
   },
+
+  /**
+   * Switches the device off: off the air, display away, and the boot
+   * sequence again the next time it opens. The game leaves the frequency
+   * and hides the interface; the browser does the same on its own.
+   */
+  powerOff(): void {
+    ui.home()
+    radio.reboot()
+
+    if (inGame) {
+      void sendNuiCallback('power')
+      return
+    }
+
+    radio.patch({ tuned: null, receiving: false, transmitting: false })
+    radio.setVisible(false)
+  },
 }

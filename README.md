@@ -11,13 +11,13 @@ Built on [`siku_voice`](https://github.com/siku-project/siku_voice): the radio o
 
 ## Features
 
-- **A real handheld** — the device sits at the bottom right, boots once per session with its own sequence, and every physical key is clickable: MENU, BACK, SCAN, VFO/MR, the dial, P1 to P3 and the keypad. Arrows, Enter and the digits work from the keyboard too, and Escape puts the radio away.
+- **A real handheld** — the device sits at the bottom right, boots once per session with its own sequence, and every physical key is clickable: MENU, BACK, SCAN, VFO/MR, the dial, P1 to P3 and the keypad. Arrows, Enter and the digits work from the keyboard too, and Escape puts the radio away. While it is open the player keeps walking, but the game lets go of the mouse and of every key the display reads: no camera turn, no shot on a click, no weapon slot on a digit, no phone on an arrow, no pause menu on Escape (`DeviceConfig.focus.controls`).
 - **Frequencies and channels** — reserved bands belong to a job (LSPD and EMS out of the box) and carry named channels; every other frequency is open, the frequency being the channel, or carrying numbered channels by configuration. The keypad types a frequency, `#` tunes it, `*` erases.
 - **Presets** — P1 to P3 jump to a reserved band, and only answer to a player holding its job. No job resource exists yet: the core roles stand in, and a resolver hook is ready for one.
 - **Push to talk through siku_voice** — Left Alt by default, rebindable, working with the device closed: the transmission rides a voice route to the members of the frequency, the microphone is held through the voice, and everyone hears the talker through the radio effect at their own device volume. A dead or cuffed player, closed by a voice restriction, cannot transmit.
 - **Animation and prop** — the radio in the hand, raised to the mouth while transmitting.
 - **Sounds** — mic clicks, squelch on reception, key tones, boot, alert, all switchable from the device settings.
-- **A working menu** — frequency, channels, recents, scan, volume, emergency alert, settings, info. On a band with channels the arrows switch channel from the home screen, and VFO/MR steps to the next one.
+- **A working menu** — frequency, channels, recents, scan, volume, leave the frequency, emergency alert, settings, info, power off. The menu shows each player what they can use: a citizen never sees the alert, nor the channels when open frequencies are single (a service member always does, for their own bands), and the frequency is only left once one is tuned. Power off leaves the frequency, puts the device away and boots it again the next time. On a band with channels the arrows switch channel from the home screen, and VFO/MR steps to the next one.
 - **Emergency alert** — a member of a service raises it in one press of the orange button at the base of the antenna, live only on their own band, or from the menu, and every device tuned to any band of that service, on any channel, rings a radio siren and shows who, where and since when. It rings in the pocket too: the player opens their radio and presses STOP. A cooldown, an optional auto stop, and a switch to turn the whole thing off live in `config/alerts.lua`.
 - **Toasts** — the device's own toasts, shadcn sonner in the ecosystem's look, whether the radio is open or in the pocket.
 - **Per session** — nothing is written to the database: a player starts fresh each time.
@@ -75,6 +75,7 @@ The device config travels to the interface with the access rule and the frequenc
 | Export | Purpose |
 |---|---|
 | `Open` / `Close` / `Toggle` / `IsOpen` | The device on screen. |
+| `PowerOff` | Ends the transmission, leaves the frequency and puts the device away. |
 | `GetTuned` / `Tune` / `Leave` | Where the device is, and moving it. |
 | `IsTalking` / `StartTalking` / `StopTalking` | The transmission, as the key does it. |
 | `GetVolume` / `SetVolume` | The device volume, 0 to 100. |

@@ -169,6 +169,23 @@ export const config = {
     return state.access.mode === 'everyone' || state.access.allowed
   },
 
+  /** Whether the player belongs to a service that owns a reserved band. */
+  get hasService(): boolean {
+    const job = state.access.job
+
+    return job !== null && state.frequencies.reserved.some((band) => band.job === job)
+  },
+
+  /**
+   * Whether channels exist for this player: always when open frequencies
+   * carry channels, otherwise only on the bands of their own service.
+   */
+  get hasChannels(): boolean {
+    const { mode, count } = state.frequencies.open
+
+    return (mode === 'channels' && count > 1) || this.hasService
+  },
+
   /** The reserved band on a frequency, if any. */
   band(frequency: number): ReservedBand | null {
     return state.frequencies.reserved.find((band) => band.frequency === frequency) ?? null
