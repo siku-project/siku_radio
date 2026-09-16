@@ -2,7 +2,7 @@
 
 A modern, immersive radio system for the SIKU ecosystem — featuring a realistic in-device interface, channel management, player communication, and a clean, modular architecture built for high-quality FiveM roleplay.
 
-![Version](https://img.shields.io/badge/version-0.1.0-4785bd)
+![Version](https://img.shields.io/badge/version-1.0.0-4785bd)
 ![FiveM](https://img.shields.io/badge/fx__version-cerulean-4785bd)
 ![Lua](https://img.shields.io/badge/Lua-5.4-4785bd)
 ![Svelte](https://img.shields.io/badge/Svelte-5-4785bd)
