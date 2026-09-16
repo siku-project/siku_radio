@@ -9,9 +9,41 @@ name 'siku_radio'
 
 lua54 'yes'
 
+shared_scripts {
+  '@siku_core/init.lua',
+  'config/translation.lua',
+  'config/access.lua',
+  'config/frequencies.lua',
+  'config/device.lua',
+  'config/alerts.lua',
+  'shared/locale.lua',
+  'shared/bands.lua',
+}
+
+server_scripts {
+  'server/init.lua',
+  'server/modules/jobs.lua',
+  'server/modules/access.lua',
+  'server/modules/rooms.lua',
+  'server/modules/command.lua',
+  'server/modules/api.lua',
+}
+
+client_scripts {
+  'client/modules/state.lua',
+  'client/modules/nui.lua',
+  'client/modules/voice.lua',
+  'client/modules/hud.lua',
+  'client/modules/talk.lua',
+  'client/modules/ui.lua',
+  'client/modules/events.lua',
+  'client/modules/api.lua',
+}
+
 ui_page 'web/dist/index.html'
 
 files {
+  'translations/*.lua',
   'web/dist/**/*',
 }
 
