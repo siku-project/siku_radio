@@ -11,7 +11,7 @@ Built on [`siku_voice`](https://github.com/siku-project/siku_voice): the radio o
 
 ## Features
 
-- **A real handheld** — the device sits at the bottom right, boots once per session with its own sequence, and every physical key is clickable: MENU, BACK, SCAN, VFO/MR, the dial, P1 to P3 and the keypad. Arrows, Enter, Escape and the digits work from the keyboard too.
+- **A real handheld** — the device sits at the bottom right, boots once per session with its own sequence, and every physical key is clickable: MENU, BACK, SCAN, VFO/MR, the dial, P1 to P3 and the keypad. Arrows, Enter and the digits work from the keyboard too, and Escape puts the radio away.
 - **Frequencies and channels** — reserved bands belong to a job (LSPD and EMS out of the box) and carry named channels; every other frequency is open, the frequency being the channel, or carrying numbered channels by configuration. The keypad types a frequency, `#` tunes it, `*` erases.
 - **Presets** — P1 to P3 jump to a reserved band, and only answer to a player holding its job. No job resource exists yet: the core roles stand in, and a resolver hook is ready for one.
 - **Push to talk through siku_voice** — Left Alt by default, rebindable, working with the device closed: the transmission rides a voice route to the members of the frequency, the microphone is held through the voice, and everyone hears the talker through the radio effect at their own device volume. A dead or cuffed player, closed by a voice restriction, cannot transmit.
@@ -48,7 +48,8 @@ The device config travels to the interface with the access rule and the frequenc
 |---|---|
 | `Left Alt` | Held to transmit on the tuned frequency. |
 | `/radio` | Opens or closes the device, until the inventory item takes over. |
-| Arrows, Enter, Escape | Walk the menu, pick, go back. On the home screen the arrows switch channel, or the volume on a single-channel frequency. |
+| Arrows, Enter | Walk the menu and pick. On the home screen the arrows switch channel, or the volume on a single-channel frequency. |
+| Escape | Closes the radio, whatever screen it shows. The BACK key goes one screen back instead. |
 | `+` / `-` | The volume, from any screen. |
 | Digits, `Backspace`, `Enter` | Type a frequency, erase, tune. |
 
