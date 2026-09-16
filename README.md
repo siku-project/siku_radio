@@ -93,7 +93,7 @@ The device config travels to the interface with the access rule and the frequenc
 
 Every string lives in `translations/fr.lua` and `translations/en.lua`, the interface ones in their `web` block, like every other resource. The game pushes the block of the configured language to the interface at startup, so a wording edited in Lua shows without a rebuild.
 
-The interface is typed by [Paraglide](https://paraglidejs.com): `web/messages/<language>.json` is generated from the Lua files by `bun run locales`, run by `dev` and `build` on its own, and the pushed strings win over the compiled ones at runtime. Adding a key means adding it to both Lua files, then rebuilding; `bun run check` refuses a JSON that fell behind.
+The interface is typed by [Paraglide](https://paraglidejs.com): `web/messages/<language>.json` is generated from the Lua files by `bun run locales`, then compiled by Paraglide; `bun run messages` does both, and `dev`, `build` and `type-check` run it first so the types never lag behind the Lua. The pushed strings win over the compiled ones at runtime. Adding a key means adding it to both Lua files, then rebuilding; `bun run check` refuses a JSON that fell behind.
 
 ## Development
 
