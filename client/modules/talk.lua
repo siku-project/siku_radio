@@ -115,6 +115,28 @@ local function animate()
   detachProp()
 end
 
+--- Applies the animation config again in the middle of a transmission:
+--- the prop is put back on the hand where the config now says, and the
+--- running loop plays the pose the config now names.
+---@return boolean applied Whether a transmission was running to apply it to.
+function RadioTalk.refresh()
+  if not RadioState.isTalking() then
+    return false
+  end
+
+  local animation <const> = DeviceConfig.animation
+
+  if not loadAssets(animation.dict, animation.prop) then
+    return false
+  end
+
+  ClearPedTasks(PlayerPedId())
+  detachProp()
+  attachProp()
+
+  return true
+end
+
 --- Starts a transmission, when the device allows one.
 ---@return boolean started Whether the key opened the microphone.
 function RadioTalk.start()

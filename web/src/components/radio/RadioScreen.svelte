@@ -1,12 +1,21 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { Lock } from '@lucide/svelte'
+  import { Lock, X } from '@lucide/svelte'
   import { m } from '@/lib/i18n.svelte'
   import { config } from '@/lib/config.svelte'
+  import { channelTargets, quickTargets, type QuickTarget } from '@/lib/quick'
   import type { RadioState } from '@/lib/radio.svelte'
   import { ui } from '@/lib/ui.svelte'
 
-  let { device }: { device: RadioState } = $props()
+  let {
+    device,
+    onTune,
+    onLeave,
+  }: {
+    device: RadioState
+    onTune: (target: QuickTarget) => void
+    onLeave: () => void
+  } = $props()
 
   const SIGNAL_BARS = [1, 2, 3, 4]
   const VOLUME_BARS = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -18,7 +27,15 @@
   const volumeBars = $derived(Math.round((device.volume / 100) * VOLUME_BARS.length))
   const batteryLevel = $derived(Math.max(0, Math.min(100, device.battery)))
   const title = $derived(tuned ? (tuned.label ?? tuned.frequency.toFixed(3)) : 'VX-8')
-  const hasChannels = $derived(tuned ? config.channels(tuned.frequency).length > 1 : false)
+
+  /**
+   * One row of chips: the channels of the band when it has some, otherwise
+   * the places to go, the current one left out since it is already read above.
+   */
+  const channels = $derived(channelTargets())
+  const targets = $derived(
+    channels.length > 0 ? channels : quickTargets().filter((target) => !target.active),
+  )
 
   const readClock = (): string =>
     new Date().toLocaleTimeString([], {
@@ -91,33 +108,56 @@
         {m.radio_locked_subtitle()}
       </span>
     </div>
-  {:else if tuned}
-    <div class="flex flex-col items-center gap-[0.25em] text-center">
-      <span class="flex items-baseline justify-center">
-        <span class="text-[1.45em] font-semibold leading-none tracking-[0.02em]">
-          {tuned.frequency.toFixed(3)}
-        </span>
-        <span class="ml-[0.3em] text-[0.55em] font-medium opacity-70">MHz</span>
-      </span>
-      <span
-        class="flex items-center gap-[0.6em] whitespace-nowrap text-[0.4em] uppercase tracking-[0.18em] opacity-65"
-      >
-        {#if tuned.channelLabel}
-          <span>{tuned.channelLabel}</span>
-        {/if}
-        {#if hasChannels}
-          <span class="opacity-70">{m.radio_channel_hint()}</span>
-        {/if}
-      </span>
-    </div>
   {:else}
     <div class="flex flex-col items-center gap-[0.3em] text-center">
-      <span class="text-[0.95em] font-semibold leading-none tracking-[0.12em] opacity-40">
-        ---.---
-      </span>
-      <span class="whitespace-nowrap text-[0.38em] uppercase tracking-[0.18em] opacity-60">
-        {m.radio_home_hint()}
-      </span>
+      {#if tuned}
+        <span class="relative flex items-baseline justify-center">
+          <span class="text-[1.35em] font-semibold leading-none tracking-[0.02em]">
+            {tuned.frequency.toFixed(3)}
+          </span>
+          <span class="ml-[0.3em] text-[0.5em] font-medium opacity-70">MHz</span>
+          <button
+            type="button"
+            class="radio-leave pointer-events-auto absolute left-full top-1/2 ml-[0.6em] flex h-[1.1em] w-[1.1em] -translate-y-1/2 items-center justify-center rounded-full text-[0.6em]"
+            title={m.radio_leave()}
+            aria-label={m.radio_leave()}
+            onclick={onLeave}
+          >
+            <X class="h-[70%] w-[70%]" />
+          </button>
+        </span>
+      {:else}
+        <span class="text-[0.85em] font-semibold leading-none tracking-[0.12em] opacity-40">
+          ---.---
+        </span>
+      {/if}
+
+      {#if targets.length > 0}
+        <div
+          class="radio-chips pointer-events-auto flex max-w-full items-center gap-[0.35em] overflow-x-auto whitespace-nowrap px-[0.2em] text-[0.4em] uppercase tracking-[0.14em]"
+        >
+          {#each targets as target (target.key)}
+            <button
+              type="button"
+              class="radio-chip shrink-0 rounded-[0.5em] border px-[0.7em] py-[0.2em] leading-none"
+              class:radio-chip--active={target.active}
+              disabled={target.active}
+              onclick={() => onTune(target)}
+              {@attach (node) => {
+                if (target.active) {
+                  node.scrollIntoView({ inline: 'center', block: 'nearest' })
+                }
+              }}
+            >
+              {target.label}
+            </button>
+          {/each}
+        </div>
+      {:else if !tuned}
+        <span class="whitespace-nowrap text-[0.38em] uppercase tracking-[0.18em] opacity-60">
+          {m.radio_home_hint()}
+        </span>
+      {/if}
     </div>
   {/if}
 
@@ -194,5 +234,48 @@
         transparent 3px
       ),
       radial-gradient(90% 80% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.45) 100%);
+  }
+
+  /** The chips sit above the glass so the pointer reaches them. */
+  .radio-chips {
+    position: relative;
+    z-index: 1;
+  }
+
+  .radio-chip {
+    border-color: rgba(158, 208, 251, 0.28);
+    color: rgba(158, 208, 251, 0.75);
+    text-shadow: none;
+    transition:
+      background 120ms ease,
+      border-color 120ms ease,
+      color 120ms ease;
+  }
+
+  .radio-chip:hover:not(:disabled) {
+    border-color: rgba(158, 208, 251, 0.7);
+    background: rgba(108, 182, 246, 0.14);
+    color: var(--sk-accent-text);
+  }
+
+  .radio-chip--active {
+    border-color: var(--sk-accent);
+    background: var(--sk-accent);
+    color: var(--sk-accent-ink);
+    box-shadow: 0 0 0.6em rgba(108, 182, 246, 0.55);
+  }
+
+  .radio-leave {
+    position: absolute;
+    z-index: 1;
+    color: rgba(158, 208, 251, 0.55);
+    transition:
+      background 120ms ease,
+      color 120ms ease;
+  }
+
+  .radio-leave:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
   }
 </style>
