@@ -101,7 +101,7 @@ function RadioRooms.tune(sessionId, rawFrequency, rawChannel)
     return false
   end
 
-  if not RadioAccess.canTune(sessionId, frequency) then
+  if not RadioAccess.canTune(sessionId, frequency) or not RadioItem.verify(sessionId) then
     TriggerClientEvent(EVENT_REFUSED, sessionId, RadioBands.reserved(frequency) and 'job' or 'access')
     return false
   end
@@ -162,6 +162,10 @@ function RadioRooms.setTalking(sessionId, talking)
   local session <const> = sessions[sessionId]
 
   if not session or session.talking == talking then
+    return
+  end
+
+  if talking and not RadioItem.verify(sessionId) then
     return
   end
 

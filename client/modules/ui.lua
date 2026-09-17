@@ -42,7 +42,7 @@ end
 --- player still moves and still transmits.
 ---@return nil
 function RadioUi.open()
-  if RadioState.isOpen() then
+  if RadioState.isOpen() or not RadioState.hasDevice() then
     return
   end
 
@@ -83,7 +83,13 @@ end
 ---@return nil
 function RadioUi.powerOff()
   RadioTalk.stop()
-  TriggerServerEvent('siku_radio:server:leave')
+
+  if RadioItem.isEnabled() then
+    TriggerServerEvent('siku_radio:server:power')
+  else
+    TriggerServerEvent('siku_radio:server:leave')
+  end
+
   RadioUi.close()
 end
 
@@ -121,6 +127,7 @@ RegisterNUICallback('siku_radio:nui:volume', function(data, cb)
   if value and RadioState.setVolume(value) then
     RadioVoice.applyVolume()
     RadioNui.pushState({ volume = RadioState.volume() })
+    RadioItem.reportVolume()
   end
 end)
 

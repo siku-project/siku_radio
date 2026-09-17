@@ -40,11 +40,11 @@ local function renderingVolume()
   return RadioState.volume() / 100
 end
 
---- Whether the player may transmit right now: on a frequency, connected,
---- and not closed by a restriction such as death or cuffs.
+--- Whether the player may transmit right now: a radio in hand, on a
+--- frequency, connected, and not closed by a restriction such as death or cuffs.
 ---@return boolean allowed Whether a transmission may start.
 function RadioVoice.canTransmit()
-  if not RadioState.room() or not RadioState.isAllowed() then
+  if not RadioState.hasDevice() or not RadioState.room() or not RadioState.isAllowed() then
     return false
   end
 
