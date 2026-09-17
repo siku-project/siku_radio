@@ -10,6 +10,10 @@ return {
   ['keybind_open'] = 'Radio - Ouvrir / fermer',
   ['command_radio_description'] = 'Ouvre ou ferme la radio',
   ['command_radioanim_description'] = "Règle l'animation et le prop de la radio en direct",
+  ['inventory_missing'] = "Mode item configuré mais '%s' n'est pas démarré : aucune radio ne sera utilisable tant qu'il ne tourne pas",
+  ['inventory_linked'] = "L'item '%s' de '%s' prend la radio en main",
+  ['inventory_item_not_unique'] = "L'item '%s' n'a pas d'identifiant d'instance : déclarez-le unique dans l'inventaire pour qu'il garde son état",
+  ['inventory_export_failed'] = "L'export inventaire '%s' a échoué : %s",
 
   web = {
     ['radio_no_channel'] = 'Aucune fréquence',

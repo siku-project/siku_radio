@@ -20,7 +20,7 @@ Built on [`siku_voice`](https://github.com/siku-project/siku_voice): the radio o
 - **A working menu** — frequency, channels, recents, scan, volume, leave the frequency, emergency alert, settings, info, power off. The menu shows each player what they can use: a citizen never sees the alert, nor the channels when open frequencies are single (a service member always does, for their own bands), and the frequency is only left once one is tuned. Power off leaves the frequency, puts the device away and boots it again the next time. On a band with channels the arrows switch channel from the home screen, and VFO/MR steps to the next one.
 - **Emergency alert** — a member of a service raises it in one press of the orange button at the base of the antenna, live only on their own band, or from the menu, and every device tuned to any band of that service, on any channel, rings a radio siren and shows who, where and since when. It rings in the pocket too: the player opens their radio and presses STOP. A cooldown, an optional auto stop, and a switch to turn the whole thing off live in `config/alerts.lua`.
 - **Toasts** — the device's own toasts, shadcn sonner in the ecosystem's look, whether the radio is open or in the pocket.
-- **Per session** — nothing is written to the database: a player starts fresh each time.
+- **Per session, or per item** — in command mode nothing is written anywhere: a player starts fresh each time. In item mode (`config/inventory.lua`) the radio is the `radio` item of siku_inventory: using it takes it in hand, powers it on and opens it, and each radio keeps its own state in its metadata (on or off, frequency, channel, volume), so one handed to another player arrives as it was left, and a powered radio in the pocket comes back on the air when the character loads. A radio given away, dropped or stored is no longer heard nor spoken into: the server checks the item is still carried before tuning and before opening the microphone. `/radio` does not exist in that mode. The link is soft: no dependency, the radio starts without the inventory and only talks to it once it runs.
 
 ## Dependencies
 
@@ -38,6 +38,7 @@ Built on [`siku_voice`](https://github.com/siku-project/siku_voice): the radio o
 | `config/frequencies.lua` | `range`, `step`, `reserved` bands with `job`, `preset` and `channels`, `open` mode single / channels |
 | `config/device.lua` | `keybinds` (`talk`, `open`), `volume` (`default`, `step`), `voice` (`effect`, `priority`), `animation`, `sounds`, `boot`, `display` (`clock24h`, durations), `scan.dwell` |
 | `config/alerts.lua` | `enabled`, `cooldown` (seconds), `autoStop` (seconds, 0 to ring until STOP) |
+| `config/inventory.lua` | `mode` command / item, `resource`, `item`, `restoreOnLoad` |
 | `config/translation.lua` | `language` (`fr` / `en`) |
 
 The device config travels to the interface with the access rule and the frequencies, so a value changed in Lua changes the device without touching the web.
@@ -47,7 +48,7 @@ The device config travels to the interface with the access rule and the frequenc
 | Key | Action |
 |---|---|
 | `Left Alt` | Held to transmit on the tuned frequency. |
-| `/radio` | Opens or closes the device, until the inventory item takes over. |
+| `/radio` | Opens or closes the device, in command mode only. |
 | Arrows, Enter | Walk the menu and pick. On the home screen the arrows switch channel, or the volume on a single-channel frequency. |
 | Escape | Closes the radio, whatever screen it shows. The BACK key goes one screen back instead. |
 | `Backspace` | On the home screen, leaves the frequency. |

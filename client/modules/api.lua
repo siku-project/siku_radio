@@ -82,6 +82,7 @@ local function setVolume(value)
 
   RadioVoice.applyVolume()
   RadioNui.pushState({ volume = RadioState.volume() })
+  RadioItem.reportVolume()
 
   return true
 end
