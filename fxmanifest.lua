@@ -16,6 +16,7 @@ shared_scripts {
   'config/frequencies.lua',
   'config/device.lua',
   'config/alerts.lua',
+  'config/inventory.lua',
   'shared/locale.lua',
   'shared/bands.lua',
 }
@@ -25,6 +26,7 @@ server_scripts {
   'server/modules/jobs.lua',
   'server/modules/access.lua',
   'server/modules/rooms.lua',
+  'server/modules/item.lua',
   'server/modules/command.lua',
   'server/modules/api.lua',
 }
@@ -37,6 +39,7 @@ client_scripts {
   'client/modules/talk.lua',
   'client/modules/tuning.lua',
   'client/modules/ui.lua',
+  'client/modules/item.lua',
   'client/modules/events.lua',
   'client/modules/api.lua',
 }

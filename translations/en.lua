@@ -10,6 +10,10 @@ return {
   ['keybind_open'] = 'Radio - Open / close',
   ['command_radio_description'] = 'Opens or closes the radio',
   ['command_radioanim_description'] = 'Tunes the radio animation and prop live',
+  ['inventory_missing'] = "Item mode configured but '%s' is not started: no radio can be used until it runs",
+  ['inventory_linked'] = "Item '%s' of '%s' takes the radio in hand",
+  ['inventory_item_not_unique'] = "Item '%s' carries no instance id: declare it unique in the inventory so it keeps its state",
+  ['inventory_export_failed'] = "Inventory export '%s' failed: %s",
 
   web = {
     ['radio_no_channel'] = 'No frequency',

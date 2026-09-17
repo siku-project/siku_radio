@@ -7,6 +7,7 @@ local receiving = {}
 local open = false
 local talking = false
 local volume = DeviceConfig.volume.default
+local device = { mode = InventoryConfig.mode, active = nil }
 
 --- The access rule as the server last sent it.
 ---@return table access { mode, allowed, job, presets }.
@@ -160,6 +161,26 @@ function RadioState.setVolume(value)
   volume = math.max(0, math.min(100, math.floor(value + 0.5)))
 
   return true
+end
+
+--- Where the radio comes from, and which one is in hand.
+---@return table device { mode, active? }.
+function RadioState.device()
+  return device
+end
+
+--- Keeps what the server said about the radio in hand.
+---@param value table { mode, active? }.
+---@return nil
+function RadioState.setDevice(value)
+  device = { mode = value.mode or InventoryConfig.mode, active = value.active }
+end
+
+--- Whether a radio answers at all: always in command mode, otherwise only
+--- while one is taken in hand.
+---@return boolean held Whether the device may be used.
+function RadioState.hasDevice()
+  return device.mode ~= 'item' or device.active ~= nil
 end
 
 --- The whole device state as the interface needs it. Who else is on the

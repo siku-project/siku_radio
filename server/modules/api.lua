@@ -7,7 +7,7 @@ end
 
 --- Where a player is tuned, and what they may do.
 ---@param sessionId number The player server id.
----@return table? radio { frequency?, channel?, key?, talking, allowed, job }, or nil when offline.
+---@return table? radio { frequency?, channel?, key?, talking, allowed, job, device? }, or nil when offline.
 local function getPlayerRadio(sessionId)
   if not isOnline(sessionId) then
     return nil
@@ -22,6 +22,7 @@ local function getPlayerRadio(sessionId)
     talking = room.talking == true,
     allowed = RadioAccess.isAllowed(sessionId),
     job = RadioJobs.get(sessionId),
+    device = RadioItem.active(sessionId),
   }
 end
 
