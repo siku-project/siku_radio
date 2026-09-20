@@ -185,10 +185,10 @@ end
 
 --- The whole device state as the interface needs it. Who else is on the
 --- frequency stays on the game side.
----@return table state { tuned, transmitting, receiving, volume }.
+---@return table state { tuned, transmitting, receiving, volume }, tuned being false when off the air since a nil key would vanish on the way.
 function RadioState.describe()
   return {
-    tuned = room,
+    tuned = room or false,
     transmitting = talking,
     receiving = RadioState.isReceiving(),
     volume = volume,

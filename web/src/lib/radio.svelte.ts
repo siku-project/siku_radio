@@ -105,11 +105,17 @@ export const radio = {
     return whole + Number(fraction) / 1000
   },
 
-  patch(changes: Partial<RadioState>): void {
-    state = { ...state, ...changes }
+  /**
+   * A state patch from the game. Off the air travels as `tuned: false`,
+   * since a nil key would vanish from the Lua table on the way.
+   */
+  patch(changes: Omit<Partial<RadioState>, 'tuned'> & { tuned?: RadioRoom | null | false }): void {
+    const tuned = changes.tuned === false ? null : changes.tuned
 
-    if (changes.tuned) {
-      radio.remember(changes.tuned.frequency)
+    state = { ...state, ...changes, tuned: tuned === undefined ? state.tuned : tuned }
+
+    if (tuned) {
+      radio.remember(tuned.frequency)
     }
   },
 
