@@ -23,7 +23,7 @@ RegisterNetEvent('siku_radio:client:setRoom', function(room)
     RadioVoice.clear()
   end
 
-  RadioNui.pushState({ tuned = RadioState.room(), receiving = false })
+  RadioNui.pushState({ tuned = RadioState.room() or false, receiving = false })
   RadioHud.sync()
 
   TriggerEvent(EVENT_TUNED, RadioState.room())
