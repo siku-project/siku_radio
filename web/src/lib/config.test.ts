@@ -11,11 +11,11 @@ describe('config', () => {
   })
 
   it('reserves a band to its job', () => {
-    config.setJob(null)
+    config.setJobs([])
     expect(config.canTune(155.475)).toBe(false)
     expect(config.canTune(160)).toBe(true)
 
-    config.setJob('police')
+    config.setJobs(['police'])
     expect(config.canTune(155.475)).toBe(true)
     expect(config.canTune(155.34)).toBe(false)
     expect(config.preset(1)?.allowed).toBe(true)

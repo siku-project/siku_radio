@@ -121,10 +121,13 @@
             {#each JOBS as job (job.label)}
               <button
                 type="button"
-                class="sk-chip px-3 py-1.5 text-xs {config.access.job === job.value
+                class="sk-chip px-3 py-1.5 text-xs {(
+                  job.value === null ? config.access.jobs.length === 0 : config.hasJob(job.value)
+                )
                   ? 'sk-chip--active'
                   : ''}"
-                onclick={() => config.setJob(job.value)}
+                onclick={() =>
+                  job.value === null ? config.clearJobs() : config.toggleJob(job.value)}
               >
                 {job.label}
               </button>
