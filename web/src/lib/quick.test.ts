@@ -5,7 +5,7 @@ import { radio } from './radio.svelte'
 
 describe('quick targets', () => {
   it('lists the bands of the service first, then the recents, without repeats', () => {
-    config.setJob('police')
+    config.setJobs(['police'])
     radio.patch({ tuned: null })
     radio.remember(160)
     radio.remember(155.475)
@@ -18,14 +18,14 @@ describe('quick targets', () => {
   })
 
   it('never offers a band of another service to a citizen', () => {
-    config.setJob(null)
+    config.setJobs([])
     radio.remember(155.34)
 
     expect(quickTargets().some((target) => target.frequency === 155.34)).toBe(false)
   })
 
   it('marks the tuned frequency and lists its channels', () => {
-    config.setJob('ems')
+    config.setJobs(['ems'])
     radio.patch({
       tuned: {
         key: '155.340/2',

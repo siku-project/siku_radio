@@ -10,7 +10,8 @@ export interface RadioPreset {
 export interface RadioAccess {
   mode: AccessMode
   allowed: boolean
-  job: string | null
+  /** The jobs the player's character belongs to, by name. */
+  jobs: string[]
   presets: RadioPreset[]
 }
 
@@ -88,8 +89,9 @@ const DEVICE_DEFAULTS: RadioDevice = {
 }
 
 /**
- * In the browser, `?access=restricted&allowed=0` and `?job=police` simulate
- * the server's answer; in the game everything comes from the ready call.
+ * In the browser, `?access=restricted&allowed=0` and `?jobs=police,ems`
+ * simulate the server's answer; in the game everything comes from the
+ * ready call.
  */
 const initial = (): RadioConfig => {
   const frequencies: RadioFrequencies = {
@@ -101,7 +103,7 @@ const initial = (): RadioConfig => {
 
   if (!import.meta.env.DEV) {
     return {
-      access: { mode: 'everyone', allowed: false, job: null, presets: [] },
+      access: { mode: 'everyone', allowed: false, jobs: [], presets: [] },
       frequencies,
       device: DEVICE_DEFAULTS,
       alerts: { enabled: true, autoStop: 0 },
@@ -110,16 +112,16 @@ const initial = (): RadioConfig => {
 
   const params = new URLSearchParams(window.location.search)
   const mode: AccessMode = params.get('access') === 'restricted' ? 'restricted' : 'everyone'
-  const job = params.get('job')
+  const jobs = (params.get('jobs') ?? '').split(',').filter((job) => job !== '')
   const presets = DEV_BANDS.filter((band) => band.preset !== null).map((band) => ({
     index: band.preset!,
     label: band.label,
     frequency: band.frequency,
-    allowed: band.job === job,
+    allowed: jobs.includes(band.job),
   }))
 
   return {
-    access: { mode, allowed: params.get('allowed') !== '0', job, presets },
+    access: { mode, allowed: params.get('allowed') !== '0', jobs, presets },
     frequencies,
     device: DEVICE_DEFAULTS,
     alerts: { enabled: params.get('alerts') !== '0', autoStop: 0 },
@@ -161,7 +163,12 @@ export const config = {
 
     const band = this.band(frequency)
 
-    return band !== null && band.job === state.access.job
+    return band !== null && this.hasJob(band.job)
+  },
+
+  /** Whether the player belongs to a job. */
+  hasJob(job: string): boolean {
+    return state.access.jobs.includes(job)
   },
 
   /** Whether the player may use the device at all. */
@@ -171,9 +178,7 @@ export const config = {
 
   /** Whether the player belongs to a service that owns a reserved band. */
   get hasService(): boolean {
-    const job = state.access.job
-
-    return job !== null && state.frequencies.reserved.some((band) => band.job === job)
+    return state.frequencies.reserved.some((band) => this.hasJob(band.job))
   },
 
   /**
@@ -199,7 +204,7 @@ export const config = {
 
     const band = this.band(frequency)
 
-    return band === null || band.job === state.access.job
+    return band === null || this.hasJob(band.job)
   },
 
   /** The channels a frequency carries, named. Empty when the frequency is the channel. */
@@ -257,12 +262,33 @@ export const config = {
     }
   },
 
-  /** Development only: pretend the player holds a job. */
-  setJob(job: string | null): void {
-    state.access.job = job
-    state.access.presets = state.access.presets.map((preset) => ({
-      ...preset,
-      allowed: this.band(preset.frequency)?.job === job,
-    }))
+  /** Development only: recomputes the presets after the jobs moved. */
+  refreshPresets(): void {
+    state.access.presets = state.access.presets.map((preset) => {
+      const band = this.band(preset.frequency)
+
+      return { ...preset, allowed: band !== null && this.hasJob(band.job) }
+    })
+  },
+
+  /** Development only: pretend the player joins or leaves a job. */
+  toggleJob(job: string): void {
+    state.access.jobs = this.hasJob(job)
+      ? state.access.jobs.filter((held) => held !== job)
+      : [...state.access.jobs, job]
+
+    this.refreshPresets()
+  },
+
+  /** Development only: pretend the player holds no job. */
+  clearJobs(): void {
+    state.access.jobs = []
+    this.refreshPresets()
+  },
+
+  /** Development only: pretend the player holds exactly these jobs. */
+  setJobs(jobs: string[]): void {
+    state.access.jobs = [...jobs]
+    this.refreshPresets()
   },
 }

@@ -47,6 +47,10 @@ local function validate(definition)
     return 'job must be a non-empty string'
   end
 
+  if definition.permission ~= nil and (type(definition.permission) ~= 'string' or definition.permission == '') then
+    return 'permission must be a non-empty string'
+  end
+
   if definition.preset ~= nil
     and (math.type(definition.preset) ~= 'integer' or definition.preset < 1 or definition.preset > MAX_PRESET) then
     return ('preset must be an integer between 1 and %d'):format(MAX_PRESET)
@@ -73,6 +77,7 @@ for index, definition in ipairs(FrequencyConfig.reserved) do
       frequency = RadioBands.normalize(definition.frequency),
       label = definition.label,
       job = definition.job,
+      permission = definition.permission,
       preset = definition.preset,
       channels = {},
     }
@@ -100,7 +105,7 @@ end
 
 --- The reserved band on a frequency.
 ---@param frequency number The frequency on the grid.
----@return table? band { frequency, label, job, preset, channels }, or nil when open.
+---@return table? band { frequency, label, job, permission?, preset, channels }, or nil when open.
 function RadioBands.reserved(frequency)
   return byFrequency[frequency]
 end

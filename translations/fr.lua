@@ -4,7 +4,6 @@ return {
   ['access_permission_granted'] = "Permission '%s' accordée au rôle '%s'",
   ['band_invalid'] = 'La bande réservée n°%d est ignorée : %s',
   ['band_duplicate'] = 'La fréquence %.3f est réservée deux fois, la seconde est ignorée',
-  ['jobs_unknown_resolver'] = "Résolveur de métier inconnu '%s', utilisation des rôles",
   ['voice_export_failed'] = "L'export siku_voice '%s' a échoué : %s",
   ['keybind_talk'] = 'Radio - Parler',
   ['keybind_open'] = 'Radio - Ouvrir / fermer',

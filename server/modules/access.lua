@@ -58,6 +58,13 @@ local function grantRoles()
   end
 end
 
+--- The character a session plays.
+---@param sessionId number The player server id.
+---@return number? characterId The character id, or nil between two.
+local function characterOf(sessionId)
+  return Siku.cache.getCurrentCharacterId(sessionId)
+end
+
 --- Whether the mode restricts radios to a permission.
 ---@return boolean restricted Whether a permission is required.
 function RadioAccess.isRestricted()
@@ -72,13 +79,53 @@ function RadioAccess.isAllowed(sessionId)
     return true
   end
 
-  local character <const> = Siku.cache.getCurrentCharacter(sessionId)
+  local characterId <const> = characterOf(sessionId)
 
-  if not character or type(character.id) ~= 'number' then
+  if not characterId then
     return false
   end
 
-  return Siku.permissions.hasPermission(character.id, AccessConfig.permission) == true
+  return Siku.permissions.hasPermission(characterId, AccessConfig.permission) == true
+end
+
+--- The jobs a player's character belongs to, by name, asked to the core
+--- job engine. Every job counts: a character may hold several.
+---@param sessionId number The player server id.
+---@return table jobs The list of job names.
+function RadioAccess.jobsOf(sessionId)
+  local characterId <const> = characterOf(sessionId)
+
+  if not characterId then
+    return {}
+  end
+
+  local memberships <const> = Siku.jobs.getMemberships(characterId)
+  local jobs <const> = {}
+
+  for i = 1, #memberships do
+    jobs[i] = memberships[i].job
+  end
+
+  return jobs
+end
+
+--- Whether a player holds the job a reserved band belongs to, and the
+--- permission the band asks for on top when it declares one.
+---@param sessionId number The player server id.
+---@param band table The reserved band.
+---@return boolean holds Whether the band answers to the player.
+function RadioAccess.holdsBand(sessionId, band)
+  local characterId <const> = characterOf(sessionId)
+
+  if not characterId then
+    return false
+  end
+
+  if band.permission then
+    return Siku.jobs.hasPermission(characterId, band.job, band.permission)
+  end
+
+  return Siku.jobs.hasJob(characterId, band.job)
 end
 
 --- Whether a player may tune a frequency: any open one when allowed, a
@@ -97,7 +144,7 @@ function RadioAccess.canTune(sessionId, frequency)
     return true
   end
 
-  return RadioJobs.has(sessionId, band.job)
+  return RadioAccess.holdsBand(sessionId, band)
 end
 
 --- The preset keys as a player sees them: each reserved band on a key,
@@ -125,12 +172,12 @@ end
 
 --- The access rule as the interface needs it.
 ---@param sessionId number The player server id.
----@return table access { mode, allowed, job, presets }.
+---@return table access { mode, allowed, jobs, presets }.
 function RadioAccess.describe(sessionId)
   return {
     mode = mode,
     allowed = RadioAccess.isAllowed(sessionId),
-    job = RadioJobs.get(sessionId),
+    jobs = RadioAccess.jobsOf(sessionId),
     presets = RadioAccess.presets(sessionId),
   }
 end
@@ -148,10 +195,28 @@ function RadioAccess.pushAll()
   for _, id in ipairs(GetPlayers()) do
     local sessionId <const> = tonumber(id)
 
-    if sessionId and Siku.cache.getCurrentCharacter(sessionId) then
+    if sessionId and characterOf(sessionId) then
       RadioAccess.push(sessionId)
     end
   end
+end
+
+--- Sends a player their rule again when their jobs moved, and takes them
+--- off a band that stopped answering to them.
+---@param sessionId? number The player server id, nil when the character is not in play.
+---@return nil
+local function handleJobsChanged(sessionId)
+  if type(sessionId) ~= 'number' then
+    return
+  end
+
+  local room <const> = RadioRooms.get(sessionId)
+
+  if room and not RadioAccess.canTune(sessionId, room.frequency) then
+    RadioRooms.leave(sessionId)
+  end
+
+  RadioAccess.push(sessionId)
 end
 
 AddEventHandler('siku:server:createCharacterInstance', function(sessionId, characterData)
@@ -161,6 +226,30 @@ AddEventHandler('siku:server:createCharacterInstance', function(sessionId, chara
 
   RadioRooms.leave(sessionId)
   RadioAccess.push(sessionId)
+end)
+
+AddEventHandler('siku:jobs:memberAdded', function(_, _, _, sessionId)
+  handleJobsChanged(sessionId)
+end)
+
+AddEventHandler('siku:jobs:memberRemoved', function(_, _, sessionId)
+  handleJobsChanged(sessionId)
+end)
+
+AddEventHandler('siku:jobs:gradeChanged', function(_, _, _, _, sessionId)
+  handleJobsChanged(sessionId)
+end)
+
+AddEventHandler('siku:jobs:dutyChanged', function(sessionId)
+  handleJobsChanged(sessionId)
+end)
+
+AddEventHandler('siku:jobs:registered', function()
+  RadioAccess.pushAll()
+end)
+
+AddEventHandler('siku:jobs:deactivated', function()
+  RadioAccess.pushAll()
 end)
 
 CreateThread(grantRoles)
