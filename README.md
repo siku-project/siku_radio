@@ -2,7 +2,7 @@
 
 A modern, immersive radio system for the SIKU ecosystem — featuring a realistic in-device interface, channel management, player communication, and a clean, modular architecture built for high-quality FiveM roleplay.
 
-![Version](https://img.shields.io/badge/version-1.0.0-4785bd)
+![Version](https://img.shields.io/badge/version-1.1.0-4785bd)
 ![FiveM](https://img.shields.io/badge/fx__version-cerulean-4785bd)
 ![Lua](https://img.shields.io/badge/Lua-5.4-4785bd)
 ![Svelte](https://img.shields.io/badge/Svelte-5-4785bd)
@@ -13,7 +13,7 @@ Built on [`siku_voice`](https://github.com/siku-project/siku_voice): the radio o
 
 - **A real handheld** — the device sits at the bottom right, boots once per session with its own sequence, and every physical key is clickable: MENU, BACK, SCAN, VFO/MR, the dial, P1 to P3 and the keypad. Arrows, Enter and the digits work from the keyboard too, and Escape puts the radio away. While it is open the player keeps walking, but the game lets go of the mouse and of every key the display reads: no camera turn, no shot on a click, no weapon slot on a digit, no phone on an arrow, no pause menu on Escape (`DeviceConfig.focus.controls`).
 - **Frequencies and channels** — reserved bands belong to a job (LSPD and EMS out of the box) and carry named channels; every other frequency is open, the frequency being the channel, or carrying numbered channels by configuration. The keypad types a frequency, `#` tunes it, `*` erases.
-- **Presets** — P1 to P3 jump to a reserved band, and only answer to a player holding its job. No job resource exists yet: the core roles stand in, and a resolver hook is ready for one.
+- **Presets** — P1 to P3 jump to a reserved band, and only answer to a member of its job, as the core job engine knows it. A band may ask for a permission of the job on top, duty rule included. A character holding several jobs gets every band of theirs.
 - **Push to talk through siku_voice** — Left Alt by default, rebindable, working with the device closed: the transmission rides a voice route to the members of the frequency, the microphone is held through the voice, and everyone hears the talker through the radio effect at their own device volume. A dead or cuffed player, closed by a voice restriction, cannot transmit.
 - **Animation and prop** — the radio in the right hand, held up at the face while transmitting, upper body only. Pose, bone, offset and rotation live in `config/device.lua`; with `animation.tuning` on, `/radioanim` changes them live while the key is held and prints the values to copy back.
 - **Sounds** — mic clicks, squelch on reception, key tones, boot, alert, all switchable from the device settings.
@@ -34,8 +34,8 @@ Built on [`siku_voice`](https://github.com/siku-project/siku_voice): the radio o
 
 | File | Options |
 |---|---|
-| `config/access.lua` | `mode` everyone / restricted, `permission`, `roles`, `jobs` (`resolver` roles / export, `export`) |
-| `config/frequencies.lua` | `range`, `step`, `reserved` bands with `job`, `preset` and `channels`, `open` mode single / channels |
+| `config/access.lua` | `mode` everyone / restricted, `permission`, `roles` |
+| `config/frequencies.lua` | `range`, `step`, `reserved` bands with `job`, optional `permission`, `preset` and `channels`, `open` mode single / channels |
 | `config/device.lua` | `keybinds` (`talk`, `open`), `volume` (`default`, `step`), `voice` (`effect`, `priority`), `animation`, `sounds`, `boot`, `display` (`clock24h`, durations), `scan.dwell` |
 | `config/alerts.lua` | `enabled`, `cooldown` (seconds), `autoStop` (seconds, 0 to ring until STOP) |
 | `config/inventory.lua` | `mode` command / item, `resource`, `item`, `restoreOnLoad` |
@@ -60,7 +60,7 @@ The home screen does the frequent things in one click: the bands of the player's
 
 ### Access
 
-`access.mode` decides who may hold a radio at all. `everyone` opens it to any character; `restricted` keeps it to characters holding `access.permission`, granted at startup to the roles listed in `access.roles`. Reserved bands add a second gate on top: their job.
+`access.mode` decides who may hold a radio at all. `everyone` opens it to any character; `restricted` keeps it to characters holding `access.permission`, granted at startup to the roles listed in `access.roles`. Reserved bands add a second gate on top: membership of their job in the core job engine, or a permission of that job when the band names one. The rule is pushed again whenever the character's jobs or duty change, and a band that stops answering takes the player off the air.
 
 ## API
 
@@ -68,11 +68,10 @@ The home screen does the frequent things in one click: the bands of the player's
 
 | Export | Arguments | Purpose |
 |---|---|---|
-| `GetPlayerRadio` | `sessionId` | `{ frequency?, channel?, key?, talking, allowed, job }`. |
+| `GetPlayerRadio` | `sessionId` | `{ frequency?, channel?, key?, talking, allowed, jobs, device? }`. |
 | `TunePlayer` / `UntunePlayer` | `sessionId, frequency, channel?` / `sessionId` | Puts a player on a frequency with the device's checks, or off the air. |
 | `GetMembers` | `frequency, channel?` | The server ids on a frequency and channel. |
 | `SetPlayerRadioOpen` | `sessionId, open` | Shows or hides a player's device. |
-| `SetJobResolver` | `resolver?` | Lets a job resource answer `(sessionId) -> job` in place of the roles. |
 | `RefreshAccess` | — | Sends every player their access rule again, after jobs changed. |
 
 ### Client exports
@@ -113,14 +112,14 @@ bun run check    # locales, format, types, lints
 bun run locales  # regenerate web/messages from translations/*.lua
 ```
 
-In the browser the device simulates the game: `?view=Radio` opens it, `?screen=menu` a given screen, `?job=police` gives a job, `?access=restricted&allowed=0` refuses the player, `?tune=155.475&channel=2` presets a frequency, `?entry=1554` types on the keypad, `?keys` outlines the clickable keys, `?toast=tuned` or `?toast=alert` shows a toast. The simulation panel, bottom left, does the same with switches.
+In the browser the device simulates the game: `?view=Radio` opens it, `?screen=menu` a given screen, `?jobs=police,ems` gives jobs, `?access=restricted&allowed=0` refuses the player, `?tune=155.475&channel=2` presets a frequency, `?entry=1554` types on the keypad, `?keys` outlines the clickable keys, `?toast=tuned` or `?toast=alert` shows a toast. The simulation panel, bottom left, does the same with switches.
 
 ## Structure
 
 ```
 siku_radio/
 ├── client/modules/    # state, nui, voice, hud, talk, ui, events, api
-├── server/modules/    # jobs, access, rooms, command, api
+├── server/modules/    # access, rooms, item, command, api
 ├── shared/            # locale, bands
 ├── config/            # behavior, language
 ├── translations/      # fr / en

@@ -8,7 +8,12 @@
   const rows = $derived([
     { label: m.info_model(), value: 'VORTEX VX-8' },
     { label: m.info_firmware(), value: `v${pkg.version}` },
-    { label: m.info_job(), value: config.access.job?.toUpperCase() ?? m.info_none() },
+    {
+      label: m.info_job(),
+      value: config.access.jobs.length
+        ? config.access.jobs.map((job) => job.toUpperCase()).join(' · ')
+        : m.info_none(),
+    },
     { label: m.info_battery(), value: `${radio.state.battery}%` },
   ])
 </script>

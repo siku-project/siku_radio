@@ -17,9 +17,12 @@ FrequencyConfig = {
 
   --- Reserved
   ---
-  --- The bands owned by a job. Nobody else can tune them, and the preset
-  --- key (`preset`, 1 to 3) jumps to them. The channels are listed in
-  --- order and walked with the arrows; a band without any has one.
+  --- The bands owned by a job, as the core job engine knows it. Every
+  --- member of the job can tune them, or only the members holding
+  --- `permission` in that job when a band names one — with the duty rule
+  --- the job attached to it. Nobody else can. The preset key (`preset`, 1
+  --- to 3) jumps to them. The channels are listed in order and walked with
+  --- the arrows; a band without any has one.
   reserved = {
     {
       frequency = 155.475,

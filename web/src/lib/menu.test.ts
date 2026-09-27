@@ -7,7 +7,7 @@ const ids = (): string[] => menuEntries().map((entry) => entry.id)
 
 describe('menu', () => {
   it('hides the alert and the channels from a citizen when a frequency is a channel', () => {
-    config.setJob(null)
+    config.setJobs([])
     config.patch({ frequencies: { ...config.frequencies, open: { mode: 'single', count: 1 } } })
 
     expect(ids()).not.toContain('emergency')
@@ -16,7 +16,7 @@ describe('menu', () => {
   })
 
   it('shows the channels to everyone when open frequencies carry them', () => {
-    config.setJob(null)
+    config.setJobs([])
     config.patch({ frequencies: { ...config.frequencies, open: { mode: 'channels', count: 4 } } })
 
     expect(ids()).toContain('channels')
@@ -24,7 +24,7 @@ describe('menu', () => {
   })
 
   it('shows the alert and the channels to a service member', () => {
-    config.setJob('police')
+    config.setJobs(['police'])
     config.patch({ frequencies: { ...config.frequencies, open: { mode: 'single', count: 1 } } })
 
     expect(config.hasService).toBe(true)

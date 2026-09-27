@@ -220,9 +220,9 @@ function RadioRooms.alert(sessionId)
     return false
   end
 
-  local job <const> = RadioJobs.get(sessionId)
+  local tunedBand <const> = RadioBands.reserved(session.frequency)
 
-  if not job or not RadioBands.reserved(session.frequency) or RadioBands.reserved(session.frequency).job ~= job then
+  if not tunedBand or not RadioAccess.holdsBand(sessionId, tunedBand) then
     TriggerClientEvent(EVENT_ALERT_REFUSED, sessionId, 'job')
     return false
   end
@@ -236,18 +236,17 @@ function RadioRooms.alert(sessionId)
 
   cooldowns[sessionId] = now
 
-  local band <const> = RadioBands.reserved(session.frequency)
   local alert <const> = {
     from = GetPlayerName(tostring(sessionId)) or ('#' .. sessionId),
-    job = job,
-    label = band.label,
+    job = tunedBand.job,
+    label = tunedBand.label,
     frequency = session.frequency,
     channel = session.channel,
     channelLabel = RadioBands.channelLabel(session.frequency, session.channel),
     at = now,
   }
 
-  for member in pairs(jobAudience(job)) do
+  for member in pairs(jobAudience(tunedBand.job)) do
     if member ~= sessionId then
       TriggerClientEvent(EVENT_ALERT, member, alert)
     end

@@ -1,6 +1,6 @@
 RadioState = {}
 
-local access = { mode = AccessConfig.mode, allowed = false, job = nil, presets = {} }
+local access = { mode = AccessConfig.mode, allowed = false, jobs = {}, presets = {} }
 local room = nil
 local members = {}
 local receiving = {}
@@ -10,19 +10,19 @@ local volume = DeviceConfig.volume.default
 local device = { mode = InventoryConfig.mode, active = nil }
 
 --- The access rule as the server last sent it.
----@return table access { mode, allowed, job, presets }.
+---@return table access { mode, allowed, jobs, presets }.
 function RadioState.access()
   return access
 end
 
 --- Keeps the access rule the server sent.
----@param rule table { mode, allowed, job, presets }.
+---@param rule table { mode, allowed, jobs, presets }.
 ---@return nil
 function RadioState.setAccess(rule)
   access = {
     mode = rule.mode,
     allowed = rule.allowed == true,
-    job = rule.job,
+    jobs = type(rule.jobs) == 'table' and rule.jobs or {},
     presets = type(rule.presets) == 'table' and rule.presets or {},
   }
 end

@@ -7,7 +7,7 @@ end
 
 --- Where a player is tuned, and what they may do.
 ---@param sessionId number The player server id.
----@return table? radio { frequency?, channel?, key?, talking, allowed, job, device? }, or nil when offline.
+---@return table? radio { frequency?, channel?, key?, talking, allowed, jobs, device? }, or nil when offline.
 local function getPlayerRadio(sessionId)
   if not isOnline(sessionId) then
     return nil
@@ -21,7 +21,7 @@ local function getPlayerRadio(sessionId)
     key = room.key,
     talking = room.talking == true,
     allowed = RadioAccess.isAllowed(sessionId),
-    job = RadioJobs.get(sessionId),
+    jobs = RadioAccess.jobsOf(sessionId),
     device = RadioItem.active(sessionId),
   }
 end
@@ -64,13 +64,6 @@ local function setPlayerRadioOpen(sessionId, open)
   return true
 end
 
---- Lets a job resource decide the job of a player.
----@param resolver function? Receives the server id, returns the job name or nil.
----@return boolean applied Whether the resolver was stored.
-local function setJobResolver(resolver)
-  return RadioJobs.setResolver(resolver)
-end
-
 --- Sends every player their access rule again, after jobs changed.
 ---@return nil
 local function refreshAccess()
@@ -82,5 +75,4 @@ exports('TunePlayer', tunePlayer)
 exports('UntunePlayer', untunePlayer)
 exports('GetMembers', getMembers)
 exports('SetPlayerRadioOpen', setPlayerRadioOpen)
-exports('SetJobResolver', setJobResolver)
 exports('RefreshAccess', refreshAccess)
